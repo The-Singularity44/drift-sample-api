@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  title: Orders API
+  version: 1.0.0
+  description: A small sample API used to demonstrate the DRIFT contract gate.
+servers:
+  - url: https://api.example.com/v1
+paths:
+  /orders:
+    post:
+      operationId: createOrder
+      summary: Place an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewOrder"
+      responses:
+        "201":
+          description: The order was placed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: The order is invalid.
+    get:
+      operationId: listOrders
+      summary: List orders
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OrderStatus"
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Orders, newest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+  /orders/{orderId}:
+    get:
+      operationId: getOrder
+      summary: Read an order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^ord_[a-z0-9]{8}$"
+      responses:
+        "200":
+          description: The order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: No such order.
+components:
+  schemas:
+    ShippingMethod:
+      type: string
+      enum: [standard, express, overnight]
+    OrderStatus:
+      type: string
+      enum: [pending, shipped, delivered, cancelled]
+    LineItem:
+      type: object
+      required: [sku, quantity]
+      properties:
+        sku:
+          type: string
+          pattern: "^[A-Z]{3}-[0-9]{4}$"
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 100
+    Address:
+      type: object
+      required: [line1, city, country]
+      properties:
+        line1:
+          type: string
+          maxLength: 200
+        city:
+          type: string
+          maxLength: 100
+        country:
+          type: string
+          pattern: "^[A-Z]{2}$"
+    NewOrder:
+      type: object
+      required: [customerId, items, shipping]
+      properties:
+        customerId:
+          type: string
+          pattern: "^cus_[a-z0-9]{8}$"
+        items:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/LineItem"
+        shipping:
+          type: object
+          required: [method, address]
+          properties:
+            method:
+              $ref: "#/components/schemas/ShippingMethod"
+            address:
+              $ref: "#/components/schemas/Address"
+    Order:
+      type: object
+      required: [id, customerId, items, status, createdAt]
+      properties:
+        id:
+          type: string
+          pattern: "^ord_[a-z0-9]{8}$"
+        customerId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/LineItem"
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        createdAt:
+          type: string
+          format: date-time
