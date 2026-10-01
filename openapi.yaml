@@ -74,7 +74,7 @@ components:
   schemas:
     ShippingMethod:
       type: string
-      enum: [standard, express, overnight]
+      enum: [standard, express]
     OrderStatus:
       type: string
       enum: [pending, shipped, delivered, cancelled]
