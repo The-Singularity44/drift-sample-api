@@ -20,7 +20,7 @@ jobs:
       - name: DRIFT
         id: drift
         # Pinned to a full commit SHA of the DRIFT repository.
-        uses: Yugvyas10/DRIFT1.2version/packages/github-action@f6cdaf8d20768af98a4fadd9664f8cdcf7b12f82
+        uses: Yugvyas10/DRIFT1.2version/packages/github-action@f9d4209366148e5da3e49f9d7db2bd7238b3d437
         with:
           spec: openapi.yaml
           traffic: traffic.jsonl
