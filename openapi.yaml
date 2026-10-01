@@ -70,6 +70,33 @@ paths:
                 $ref: "#/components/schemas/Order"
         "404":
           description: No such order.
+  /orders/{orderId}/tracking:
+    get:
+      operationId: getTracking
+      summary: Where an order is
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^ord_[a-z0-9]{8}$"
+      responses:
+        "200":
+          description: The latest tracking event.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, updatedAt]
+                properties:
+                  status:
+                    $ref: "#/components/schemas/OrderStatus"
+                  updatedAt:
+                    type: string
+                    format: date-time
+        "404":
+          description: No such order.
 components:
   schemas:
     ShippingMethod:
@@ -115,6 +142,10 @@ components:
           maxItems: 50
           items:
             $ref: "#/components/schemas/LineItem"
+        giftNote:
+          type: string
+          maxLength: 200
+          description: Printed on the packing slip.
         shipping:
           type: object
           required: [method, address]
